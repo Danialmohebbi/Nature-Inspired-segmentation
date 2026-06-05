@@ -30,6 +30,9 @@ CLASSICAL_ALGO = {
     "kmeans": kmeans_thresholding
 }
 
+DEFAULT_POP_SIZE = 50
+DEFAULT_EPOCHS = 100
+
 def segment_image(image, k, thresholds, mode="color"):
     if mode == "gray":
         return apply_thresholds(image, thresholds)
@@ -48,8 +51,8 @@ def run_segmentation(algorithm_name, image, k, mode="color", params=None):
         
     if algorithm_name in NATURE_ALGO:
         problem = SegmentationProblem(image, k, mode)
-        params.setdefault("epoch", 100)
-        params.setdefault("pop_size", 50)
+        params.setdefault("epoch", DEFAULT_EPOCHS)
+        params.setdefault("pop_size", DEFAULT_POP_SIZE)
         model = NATURE_ALGO[algorithm_name](**params)
         model.solve(problem)
         thresholds = np.sort(model.g_best.solution).clip(1,254).astype(int).tolist()
