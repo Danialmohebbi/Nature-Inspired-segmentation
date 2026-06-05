@@ -1,0 +1,16 @@
+numpy
+scipy
+opencv-python
+scikit-image
+scikit-learn
+mealpy
+torch
+torchvision
+piq
+pandas
+joblib
+pyyaml
+pingouin
+matplotlib
+seaborn
+mealpy
