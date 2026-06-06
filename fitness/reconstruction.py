@@ -12,6 +12,8 @@ def compute_psnr(original, reconstructed):
 def compute_ssim(original, reconstructed, mode="color"):
     if mode == "color":
         return ssim(original, reconstructed, data_range=255, channel_axis=2)
-    
-    return ssim(original, reconstructed, data_range=255)
+    elif mode == "gray":
+        return ssim(original, reconstructed, data_range=255)
+    else:
+        raise ValueError("Invalid mode. Use 'color' or 'gray'.")
 
