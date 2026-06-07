@@ -3,6 +3,15 @@ from skimage.filters import threshold_multiotsu
 from sklearn.cluster import KMeans
 
 def apply_thresholds(channel, thresholds):
+    """Apply intensity thresholds to a single channel image devididing the channel into segments.
+
+    Args:
+        channel (np.ndarray): 2D np.ndarray of uint8 pixel intensities.
+        thresholds (list of uint8): k-1 threshold values.
+
+    Returns:
+        np.ndarray: Segmented channel as uint8 np.ndarray with the shape (H,W).
+    """
     segmented_image = np.zeros_like(channel, dtype=np.float32)
     bins = [0] + sorted([int(t) for t in thresholds]) + [256]
     for idx in range(len(bins) - 1):
@@ -14,6 +23,19 @@ def apply_thresholds(channel, thresholds):
 
 
 def otsu_thresholding(image, k, mode="color"):
+    """
+    Segment an image using multi-level otsu thresholding.
+
+    Args:
+        image (np.ndarray): uint8 np.ndarray of shape (H,W) for gray images and (H,W,3) for color images.
+        k (int): Number of segments.
+        mode (str, optional): 'gray' or 'color' image.. Defaults to "color".
+
+    Returns:
+        tuple: 
+            segmented_image (np.ndarray): Segmented image as uint8 np.ndarray with the same shape as the input image.
+            thresholds (list of uint8): k-1 threshold values.
+    """
     if mode == "gray":
         thresholds = threshold_multiotsu(image, classes=k)
         segmented_image = apply_thresholds(image, thresholds)
@@ -29,6 +51,19 @@ def otsu_thresholding(image, k, mode="color"):
 
 
 def kmeans_thresholding(image, k, mode="color"):
+    """
+    Segment an image using KMEANS algorithim. 
+
+    Args:
+        image (np.ndarray): uint8 np.ndarray of shape (H,W) for gray images and (H,W,3) for color images.
+        k (int): Number of segments.
+        mode (str, optional): 'gray' or 'color' image.. Defaults to "color".
+
+    Returns:
+        tuple: 
+            segmented_image (np.ndarray): Segmented image as uint8 np.ndarray with the same shape as the input image.
+            thresholds (list of uint8): k-1 threshold values.
+    """
     if mode == "gray":
         x = image.flatten().reshape(-1, 1).astype(np.float32)
         kmeans = KMeans(n_clusters=k, random_state=42,n_init=10)

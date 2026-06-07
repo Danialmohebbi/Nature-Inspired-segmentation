@@ -33,7 +33,18 @@ CLASSICAL_ALGO = {
 DEFAULT_POP_SIZE = 50
 DEFAULT_EPOCHS = 100
 
-def segment_image(image, k, thresholds, mode="color"):
+def segment_image(image, thresholds, mode="color"):
+    """
+    Apply thresholds to an image to output a segmented image
+
+    Args:
+        image (np.ndarray): uint8 np.ndarray of shape (H,W) for gray images and (H,W,3) for color images.
+        thresholds (list of uint8): k-1 threshold values.
+        mode (str, optional): 'gray' or 'color' image. Defaults to "color".
+
+    Returns:
+        np.ndarray: Segmented image as uint8 np.ndarray with the same shape as the input.
+    """
     if mode == "gray":
         return apply_thresholds(image, thresholds)
     else:
@@ -46,6 +57,25 @@ def segment_image(image, k, thresholds, mode="color"):
         return segmented_image.astype(np.uint8)
 
 def run_segmentation(algorithm_name, image, k, mode="color", params=None):
+    """_summary_
+
+    Args:
+        algorithm_name (str): Key from NATURE_ALGO or CLASSICAL_ALGO.
+        image (np.ndarray): uint8 np.ndarray of shape (H,W) for gray images and (H,W,3) for color images.
+        k (int): Number of segments.
+        mode (str, optional): 'gray' or 'color' image. Defaults to "color".
+        params (dict, optional): Hyperparameters for metaheuristic algorithms. Defaults to epoch=500, pop_size=80.
+
+    Raises:
+        ValueError: If algorithm_name is not in NATURE_ALGO and CLASSICAL_ALGO.
+
+    Returns:
+        dict with keys:
+            thresholds (list of uint8): k-1 threshold values.
+            segmented_image (np.ndarray): Segmented image as uint8 np.ndarray
+            fitness: Best Kapur entropy value. None for classical.
+            history: Best fitness per epoch. None for classical.
+    """
     if params is None:
         params = {}
         
@@ -56,7 +86,7 @@ def run_segmentation(algorithm_name, image, k, mode="color", params=None):
         model = NATURE_ALGO[algorithm_name](**params)
         model.solve(problem)
         thresholds = np.sort(model.g_best.solution).clip(1,254).astype(int).tolist()
-        segmented_image = segment_image(image, k, thresholds, mode)
+        segmented_image = segment_image(image, thresholds, mode)
         return {
             "thresholds": thresholds,
             "segmented_image": segmented_image,

@@ -5,6 +5,17 @@ import os
 from fitness.kapur import kapur_entropy_fitness
 
 class SegmentationProblem(Problem):
+    """
+    Wraps the image segmentation problem as a mealpy optimization problem.
+    
+    The optimizer will search for the optimal threshold values that maximizes Kapur entropy accross the image histogram.
+
+    Args:
+        image (np.ndarray): uint8 np.ndarray of shape (H,W) for gray images and (H,W,3) for color images.
+        k (int): Number of segments.
+        mode (str): 'gray' or 'color' image.
+        **kwargs: additional arguments.
+    """
     def __init__(self, image, k, mode="color", **kwargs):
         self.image = image
         self.k = k
@@ -16,6 +27,14 @@ class SegmentationProblem(Problem):
         super().__init__(minmax="min", bounds=bounds, **kwargs)
 
 
-    def obj_func(self, candidate_solution):
-        thresholds = np.sort(candidate_solution).clip(1,254).astype(int).tolist()
+    def obj_func(self, x):
+        """
+        Objective function for mealpy which is used to evaluate a candidate solution
+        Args:
+            x (np.ndarray): Float array of threshold values
+
+        Returns:
+            float: Negative kapur entropy. Lower is better. Minimizing this value corresponds to maximizing kapur's entropy.
+        """
+        thresholds = np.sort(x).clip(1,254).astype(int).tolist()
         return kapur_entropy_fitness(self.image, thresholds, self.mode)

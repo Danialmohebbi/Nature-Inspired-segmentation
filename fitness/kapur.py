@@ -2,6 +2,16 @@ import numpy as np
 SMALL_VALUE = 1e-10
 
 def single_channel_kapur(image_channel, thresholds):
+    """
+    Compute Kapur entropy for a single channel of an image.
+    
+    Args:
+        image_channel (np.ndarray): 2D np.ndarray of uint8 pixel intensities.
+        thresholds (list of int): k-1 threshold values.
+    
+    Returns:
+        float: Total kapur entropy for the given image's channel and thresholds.
+    """
     hist, _ = np.histogram(image_channel.flatten(), bins=256, range=(0,256))
     hist = hist / hist.sum() 
     
@@ -22,6 +32,17 @@ def single_channel_kapur(image_channel, thresholds):
 
 
 def kapur_entropy_fitness(image, thresholds, mode="color"):
+    """
+    Compute negative kapur entropy to be used as a mealpy fitness function
+
+    Args:
+        image (np.ndarray): uint8 np.ndarray of shape (H,W) for gray images and (H,W,3) for color images.
+        thresholds (list of uint8): k-1 threshold values.
+        mode (str, optional): 'gray' or 'color' image. Defaults to "color".
+
+    Returns:
+        float: Negative total kapur entropy
+    """
     if mode == "gray":
         return -single_channel_kapur(image, thresholds)
     else:

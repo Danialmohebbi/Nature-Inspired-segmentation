@@ -10,6 +10,19 @@ PATCH_SIZE = 8
 SMALL_NUMBER = 1e-10
 
 def convert_to_tensor(image, mode):
+    """
+    Convert an uint8 np.ndarray to a float tensor.
+
+    Args:
+        image (np.ndarray): uint8 np.ndarray of shape (H,W) for gray images and (H,W,3) for color images.
+        mode (str): 'gray' or 'color' image.
+
+    Raises:
+        ValueError: if mode is not 'gray' or 'color'
+
+    Returns:
+        torch.tensor: Float tensor on DEVICE in [0,1]
+    """
     image = torch.tensor(image, dtype=torch.float32) / 255.0
     if mode == "color":
         image = image.permute(2, 0, 1).unsqueeze(0)
@@ -20,16 +33,60 @@ def convert_to_tensor(image, mode):
     return image
     
 def convert_to_luminance(tensor):
+    """
+    Convert a RGB tensor to grayscale luminance.
+
+    Args:
+        tensor (torch.tensor): Float tensor of shape (1,3,H,W).
+
+    Returns:
+        torch.tensor: Luminance tensor of shape (1,1,H,W).
+    """
     weights = torch.tensor([0.299, 0.587, 0.114], device=DEVICE).view(1, 3, 1, 1)
     return torch.sum(tensor * weights, dim=1, keepdim=True)
 
 def compute_mse(original, reconstructed, mode=None):
+    """
+    Compute Mean Squared Error between original and segmented image.
+
+    Args:
+        original (np.ndarray): uint8 np.ndarray representing the original image.
+        reconstructed (np.ndarray): uint8 np.ndarray representing the segmented image.
+        mode (str, optional): 'gray' or 'color' image.. Defaults to None.
+
+    Returns:
+        float: Mean Squared Error accross all pixels.
+    """
     return mean_squared_error(original.flatten().astype(np.float32), reconstructed.flatten().astype(np.float32))
 
 def compute_psnr(original, reconstructed, mode=None):
+    """
+    Compute Peak Signal to Noise Ratio between original and segmented image.
+    Args:
+        original (np.ndarray): uint8 np.ndarray representing the original image.
+        reconstructed (np.ndarray): uint8 np.ndarray representing the segmented image.
+        mode (str, optional): 'gray' or 'color' image.. Defaults to None.
+
+    Returns:
+        Float: PSNR value.
+    """
     return psnr(original, reconstructed, data_range=255)
 
 def compute_ssim(original, reconstructed, mode="color"):
+    """
+    Compute Structual Similarity Index between original and segmented image.
+
+    Args:
+        original (np.ndarray): uint8 np.ndarray representing the original image.
+        reconstructed (np.ndarray): uint8 np.ndarray representing the segmented image.
+        mode (str, optional): 'gray' or 'color' image.. Defaults to 'color'.
+
+    Raises:
+        ValueError: If mode is not 'gray' or 'color'.
+
+    Returns:
+        float: SSIM value.
+    """
     if mode == "color":
         return ssim(original, reconstructed, data_range=255, channel_axis=2)
     elif mode == "gray":
@@ -38,6 +95,20 @@ def compute_ssim(original, reconstructed, mode="color"):
         raise ValueError("Invalid mode for computing SSIM. Use 'color' or 'gray'.")
     
 def compute_fsim(original, reconstructed, mode="color"):
+    """
+    Compute Feature Similarity Index between original and segmented image.
+
+    Args:
+        original (np.ndarray): uint8 np.ndarray representing the original image.
+        reconstructed (np.ndarray): uint8 np.ndarray representing the segmented image.
+        mode (str, optional): 'gray' or 'color' image.. Defaults to 'color'.
+
+    Raises:
+        ValueError: If mode is not 'gray' or 'color'.
+
+    Returns:
+        float: FSIM value.
+    """
     if mode == "color":
         original_tensor = convert_to_tensor(original, mode="color")
         reconstructed_tensor = convert_to_tensor(reconstructed, mode="color")
@@ -56,6 +127,21 @@ def compute_fsim(original, reconstructed, mode="color"):
     
 
 def compute_qilv(original, reconstructed, mode = "color"):
+    """
+    Compute Quality Index based on Local Variance between original and segmented image.
+    
+    Args:
+        original (np.ndarray): uint8 np.ndarray representing the original image.
+        reconstructed (np.ndarray): uint8 np.ndarray representing the segmented image.
+        mode (str, optional): 'gray' or 'color' image.. Defaults to 'color'.
+
+    Raises:
+        ValueError: If mode is not 'gray' or 'color'.
+
+    Returns:
+        float: QILV value.
+
+    """
     if mode == "gray":
         original_tensor = convert_to_tensor(original, mode="gray")
         reconstructed_tensor = convert_to_tensor(reconstructed, mode="gray")
@@ -87,6 +173,23 @@ def compute_qilv(original, reconstructed, mode = "color"):
 
 
 def compute_all_metrics(original, reconstructed, mode="color"):
+    """
+    Compute all image quality metrics between original and segmented image.
+    
+    Args:
+        original (np.ndarray): uint8 np.ndarray representing the original image.
+        reconstructed (np.ndarray): uint8 np.ndarray representing the segmented image.
+        mode (str, optional): 'gray' or 'color' image.. Defaults to 'color'.
+
+
+    Returns:
+        dict with keys:
+            MSE (float): Mean Squared Error. Lower is better.
+            PSNR (float): Peak Signal to Ratio. Higher is better.
+            SSIM (float): Structual Similarity Index. Higher is better.
+            FSIM (float): Feature Similarity Index. Higher is better.
+            QILV (float): Quality Index based on Local Varience. Higher is better.
+    """
     mse = compute_mse(original, reconstructed, mode)
     psnr_value = compute_psnr(original, reconstructed, mode)
     ssim_value = compute_ssim(original, reconstructed, mode)
