@@ -5,6 +5,8 @@ from mealpy.swarm_based.PSO import OriginalPSO
 from mealpy.swarm_based.WOA import OriginalWOA
 from mealpy.swarm_based.ZOA import OriginalZOA
 from mealpy.swarm_based.GWO import OriginalGWO
+from mealpy.physics_based.SA import OriginalSA
+from mealpy.math_based.HC import OriginalHC
 from mealpy.evolutionary_based.GA import BaseGA
 from mealpy.evolutionary_based.ES import CMA_ES
 from algorithms.woazoa import WOAZOA
@@ -23,6 +25,8 @@ NATURE_ALGO  = {
     "zoa": OriginalZOA,
     "woazoa": WOAZOA,
     "gwozoa": GWOZOA,
+    "hc": OriginalHC,
+    "sa": OriginalSA
 }
 
 CLASSICAL_ALGO = {
@@ -31,7 +35,7 @@ CLASSICAL_ALGO = {
 }
 
 DEFAULT_POP_SIZE = 50
-DEFAULT_EPOCHS = 100
+DEFAULT_EPOCHS = 500
 
 def segment_image(image, thresholds, mode="color"):
     """
