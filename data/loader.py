@@ -1,30 +1,92 @@
 import os
 import cv2
-import functools 
 
-TRAIN_DATA = "train"
-TEST_DATA = "test"
-BASE_DIR = "data\\splits\\"
+BASE_DIR   = "C:\\Users\\daniy\\OneDrive\\Desktop\\Thesis\\data\\images"
+SPLITS_DIR = "C:\\Users\\daniy\\OneDrive\\Desktop\\Thesis\\data\\splits"
+
+SPLIT_FOLDERS = {
+    "train": ["train", "val"],
+    "test":  ["test"],
+}
+
 
 def load_image(path, mode="color"):
-    image = cv2.imread(path)
-    if mode == "grayscale":
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    elif mode == "color":
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    else:
-        raise ValueError("Invalid mode. Use 'color' or 'grayscale'.")
-    return image
+    """
+    Load an image from disk and convert to the specified color mode.
 
-def get_image_paths(split = "train"):
-    if split == "train":
-        data_dir = BASE_DIR + TRAIN_DATA
-    elif split == "test":
-        data_dir = BASE_DIR + TEST_DATA
+    Args:
+        path (str):  Absolute path to image file.
+        mode (str):  'color' → RGB uint8 array (H, W, 3).
+                     'gray'  → grayscale uint8 array (H, W).
+
+    Returns:
+        np.ndarray: uint8 image array.
+    """
+    image = cv2.imread(path)
+    if mode == "gray":
+        return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    elif mode == "color":
+        return cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     else:
-        raise ValueError("Invalid split. Use 'train' or 'test'.")
-    
-    image_paths = [os.path.join(data_dir, f) for f in os.listdir(data_dir)]
+        raise ValueError("mode must be 'color' or 'gray'")
+
+
+def _find_image(filename):
+    """
+    Search for an image filename across all BSD500 subfolders.
+
+    Args:
+        filename (str): Image filename e.g. '54005.jpg'
+
+    Returns:
+        str: Full absolute path to the image.
+
+    Raises:
+        FileNotFoundError: If image not found in any subfolder.
+    """
+    for subfolder in ["train", "val", "test"]:
+        path = os.path.join(BASE_DIR, filename)
+        if os.path.exists(path):
+            return path
+    raise FileNotFoundError(f"Image {filename} not found in BSD500 directories")
+
+
+def get_image_paths(split="train"):
+    """
+    Get image paths for a given split using the txt file.
+
+    Reads filenames from data/splits/train.txt or test.txt,
+    then resolves each filename to its full path in BSD500.
+
+    Args:
+        split (str): 'train' or 'test'.
+
+    Returns:
+        list of str: Absolute paths to all images in the split.
+    """
+    txt_path = os.path.join(SPLITS_DIR, f"{split}.txt")
+
+    if not os.path.exists(txt_path):
+        raise FileNotFoundError(f"Split file not found: {txt_path}")
+
+    with open(txt_path, "r") as f:
+        filenames = [line.strip() for line in f if line.strip()]
+
+    image_paths = []
+    for filename in filenames:
+        try:
+            path = _find_image(filename)
+            image_paths.append(path)
+        except FileNotFoundError as e:
+            print(f"Warning: {e}")
+
     return image_paths
 
 
+if __name__ == "__main__":
+    train = get_image_paths("train")
+    test  = get_image_paths("test")
+    print(f"Train: {len(train)}")
+    print(f"Test:  {len(test)}")
+    overlap = set(train) & set(test)
+    print(f"Overlap: {len(overlap)}")  # must be 0
