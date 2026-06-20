@@ -10,7 +10,6 @@ from mealpy.math_based.HC import OriginalHC
 from mealpy.evolutionary_based.GA import BaseGA
 from mealpy.evolutionary_based.ES import CMA_ES
 from algorithms.woazoa import WOAZOA
-from algorithms.gwozoa import GWOZOA    
 from segmentation.classical import kmeans_thresholding
 from segmentation.classical import otsu_thresholding
 from segmentation.problem import SegmentationProblem
@@ -24,7 +23,6 @@ NATURE_ALGO  = {
     "gwo": OriginalGWO,
     "zoa": OriginalZOA,
     "woazoa": WOAZOA,
-    "gwozoa": GWOZOA,
     "hc": OriginalHC,
     "sa": OriginalSA
 }

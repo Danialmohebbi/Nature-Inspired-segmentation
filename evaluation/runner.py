@@ -13,12 +13,12 @@ from segmentation.base_segmenter import run_segmentation
 #ITTERATIONS = 10
 #ALGORITHMS = ['pso','zoa','woa','hc','gwo','cmaes','woazoa','gwozoa','sa','ga','otsu','kmeans']
 CPU_COUNT = -1
-ALGORITHMS = ['zoa','woa','hc','gwo','cmaes']
-ITTERATIONS = 1
-K = [2]
+ALGORITHMS =['pso','zoa','woa','hc','gwo','cmaes','woazoa','sa','ga','otsu','kmeans']
+ITTERATIONS = 10
+K = [2,4,6,8,10]
 OUTPUT_DIR = "results"
-GRAY_COUNT = 3
-COLOR_COUNT = 0
+GRAY_COUNT = 150
+COLOR_COUNT = 150
 CSV_HEADER = [
     "algo","image_id","mode","k","trial",
     "MSE","PSNR","FSIM","SSIM","QILV","fitness",
@@ -106,34 +106,33 @@ def run_experiment():
     """
     all_images = get_image_paths("train")
     gray_paths = all_images[:GRAY_COUNT]
-    color_paths = all_images[GRAY_COUNT:COLOR_COUNT]
-    
+    color_paths = all_images[GRAY_COUNT : GRAY_COUNT + COLOR_COUNT]
+
     prepare_csv('gray')
     prepare_csv('color')
-    
+
     tasks = []
     for algo in ALGORITHMS:
         for k in K:
             for trial in range(ITTERATIONS):
                 for path in gray_paths:
                     image_id = os.path.basename(path)
-                    tasks.append((algo,path,image_id, "gray", k, trial))
+                    tasks.append((algo, path, image_id, "gray", k, trial))
                 for path in color_paths:
                     image_id = os.path.basename(path)
-                    tasks.append((algo,path,image_id, "color", k, trial)) 
-    
-    results = Parallel(n_jobs=CPU_COUNT,verbose=10)(
-        delayed(run)(
-            algo,path,image_id, mode, k, trial
-        )
-        for algo,path,image_id, mode, k, trial in tasks
-    )
-    
+                    tasks.append((algo, path, image_id, "color", k, trial))
+
     saved = 0
-    for row in results:
+    failed = 0
+    for row in Parallel(n_jobs=CPU_COUNT, verbose=10, return_as="generator")(
+        delayed(run)(algo, path, image_id, mode, k, trial)
+        for algo, path, image_id, mode, k, trial in tasks
+    ):
         if row is not None:
-            add_row(row,row['mode'])
+            add_row(row, row['mode'])
             saved += 1
-    
-    print(f"Saved {saved}/{len(tasks)} runs.")
+        else:
+            failed += 1
+
+    print(f"Saved {saved}/{len(tasks)} runs. ({failed} failed)")
     

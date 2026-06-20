@@ -10,7 +10,10 @@ class WOAZOA(Optimizer):
         
     
     def evolve(self,epoch):
-        
+        if self.pop is None:
+            return
+        if self.g_best is None:
+            return
         best_solution = self.g_best.solution.copy()
         
         a = 2 - 2 * (epoch / self.epoch)
@@ -19,8 +22,8 @@ class WOAZOA(Optimizer):
             
             position = self.pop[idx].solution.copy()
             p = (1 - epoch / self.epoch) ** self.alpha
-            
-            if np.random.rand() < p:
+            u = np.random.rand()
+            if u < p:
                 """ZOA Exploration phase"""
                 j, k = np.random.choice(range(self.pop_size), 2, replace=False)
                 x_j = self.pop[j].solution
@@ -32,8 +35,8 @@ class WOAZOA(Optimizer):
                 r_1, r_2 = np.random.rand(), np.random.rand()
                 A = 2 * a * r_1 - a
                 C = 2 * r_2
-                
-                if np.random.rand() < 0.5:
+                q = np.random.rand()
+                if q < 0.5:
                     new_position = best_solution - A * np.abs(C * best_solution - position)
                 else:
                     b = 1
@@ -42,5 +45,6 @@ class WOAZOA(Optimizer):
             
             new_position = self.correct_solution(new_position)
             new_agent = self.generate_agent(new_position)
-            if self.compare_target(new_agent.target, self.pop[idx].target,self.problem.minmax):
+            minmax = getattr(self.problem, "minmax", None) or "min"
+            if self.compare_target(new_agent.target, self.pop[idx].target, minmax):
                 self.pop[idx] = new_agent
