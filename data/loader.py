@@ -31,9 +31,9 @@ def load_image(path, mode="color"):
         raise ValueError("mode must be 'color' or 'gray'")
 
 
-def _find_image(file):
+def find_image(file):
     """
-    Search for an image filename across all BSD500 subfolders.
+    Search for an image
     Args:
         filename (str): Image filename.
     Returns:
@@ -66,7 +66,7 @@ def get_image_paths(split="train"):
     image_paths = []
     for filename in filenames:
         try:
-            path,mode = _find_image(filename)
+            path,mode = find_image(filename)
             image_paths.append((path,mode))
         except FileNotFoundError as e:
             print(f"Warning: {e}")
