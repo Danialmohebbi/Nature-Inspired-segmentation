@@ -1,2 +1,4 @@
-167062.jpg,gray
-159091.jpg,color
+barbara.png,gray
+cameraman.png,gray
+mandrill.png,color
+peppers.png,color
