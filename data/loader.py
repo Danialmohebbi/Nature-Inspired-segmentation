@@ -15,7 +15,7 @@ def load_image(path, mode="color"):
     """
     Load an image from disk and convert to the specified color mode.
     Args:
-        path (str(: Path to image file.
+        path (str): Path to image file.
         mode (str): 'gray' or 'color' image type.
     Returns:
         np.ndarray: uint8 image array.
