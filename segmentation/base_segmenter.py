@@ -1,6 +1,4 @@
 import numpy as np
-import sys
-import os
 from mealpy.swarm_based.PSO import OriginalPSO
 from mealpy.swarm_based.WOA import OriginalWOA
 from mealpy.swarm_based.ZOA import OriginalZOA
@@ -12,7 +10,7 @@ from mealpy.evolutionary_based.ES import CMA_ES
 from algorithms.woazoa import WOAZOA
 from segmentation.classical import kmeans_thresholding
 from segmentation.classical import otsu_thresholding
-from segmentation.problem import SegmentationProblem
+from segmentation.problem import FITNESS_FUNCTIONS, SegmentationProblem
 from segmentation.classical import apply_thresholds
 
 NATURE_ALGO  = {
@@ -35,7 +33,7 @@ CLASSICAL_ALGO = {
 DEFAULT_POP_SIZE = 50
 DEFAULT_EPOCHS = 500
 
-def segment_image(image, thresholds, mode="color"):
+def segment_image(image, thresholds, k ,mode="color"):
     """
     Apply thresholds to an image to output a segmented image
 
@@ -51,14 +49,14 @@ def segment_image(image, thresholds, mode="color"):
         return apply_thresholds(image, thresholds)
     else:
         segmented_image = np.zeros_like(image, dtype=np.uint8)
-        n = len(thresholds) // 3
+        n = k - 1
         idx = 0
         for channel in range(3):
             segmented_image[:, :, channel] = apply_thresholds(image[:, :, channel], thresholds[idx:idx + n])
             idx += n
         return segmented_image.astype(np.uint8)
 
-def run_segmentation(algorithm_name, image, k, mode="color", params=None):
+def run_segmentation(algorithm_name, image, k, mode="color", fitness_fn = "kapur", params = None):
     """_summary_
 
     Args:
@@ -81,14 +79,14 @@ def run_segmentation(algorithm_name, image, k, mode="color", params=None):
     if params is None:
         params = {}
         
-    if algorithm_name in NATURE_ALGO:
-        problem = SegmentationProblem(image, k, mode)
+    if algorithm_name in NATURE_ALGO and fitness_fn in FITNESS_FUNCTIONS:
+        problem = SegmentationProblem(image, k, mode, fitness_fn)
         params.setdefault("epoch", DEFAULT_EPOCHS)
         params.setdefault("pop_size", DEFAULT_POP_SIZE)
         model = NATURE_ALGO[algorithm_name](**params)
         model.solve(problem)
         thresholds = np.sort(model.g_best.solution).clip(1,254).astype(int).tolist()
-        segmented_image = segment_image(image, thresholds, mode)
+        segmented_image = segment_image(image, thresholds,k, mode)
         return {
             "thresholds": thresholds,
             "segmented_image": segmented_image,
