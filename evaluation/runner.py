@@ -111,7 +111,7 @@ def run_experiment(algorithms, k_values, n_trials, fitness_fn):
     tasks = []
     for algo in algorithms:
         for k in k_values:
-            for trial in range(n_trials):
+            for trial in range(1,n_trials):
                 for (path, mode) in all_images:
                     image_id = os.path.basename(path)
                     tasks.append((algo, path, image_id, mode, k, trial,fitness_fn))
