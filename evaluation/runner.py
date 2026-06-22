@@ -118,7 +118,7 @@ def run_experiment(algorithms, k_values, n_trials, fitness_fn):
 
     saved = 0
     failed = 0
-    for row in Parallel(n_jobs=CPU_COUNT, verbose=10, return_as="generator")(
+    for row in Parallel(n_jobs=CPU_COUNT, verbose=0, return_as="generator")(
         delayed(run)(algo, path, image_id, mode, k, trial,fitness_fn)
         for algo, path, image_id, mode, k, trial,fitness_fn in tasks
     ):
