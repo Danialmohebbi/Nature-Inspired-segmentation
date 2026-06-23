@@ -16,7 +16,7 @@ OUTPUT_DIR = "results"
 CSV_HEADER = [
     "algo","image_id","mode","k","trial","fitness_fn",
     "MSE","PSNR","FSIM","SSIM","QILV","fitness",
-    "convergence","runtime_seconds"
+    "convergence","runtime_seconds", "thresholds"
 ]
 
 def get_csv_path(mode,fitness_fn):
@@ -93,7 +93,8 @@ def run(algo, image_path, image_id, mode, k, trial,fitness_fn):
             "QILV": metrics["QILV"],
             "fitness": result["fitness"],
             "convergence": result["history"],
-            "runtime_seconds": elapsed
+            "runtime_seconds": elapsed,
+            "thresholds": result["thresholds"]
         }
         
         return row
