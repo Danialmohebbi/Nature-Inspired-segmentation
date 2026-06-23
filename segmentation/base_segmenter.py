@@ -80,7 +80,7 @@ def run_segmentation(algorithm_name, image, k, mode="color", fitness_fn = "kapur
         params = {}
         
     if algorithm_name in NATURE_ALGO and fitness_fn in FITNESS_FUNCTIONS:
-        problem = SegmentationProblem(image, k, mode, fitness_fn, log_to=None)
+        problem = SegmentationProblem(image, k, mode=mode, fitness_fn=fitness_fn, log_to=None)
         params.setdefault("epoch", DEFAULT_EPOCHS)
         params.setdefault("pop_size", DEFAULT_POP_SIZE)
         model = NATURE_ALGO[algorithm_name](**params)

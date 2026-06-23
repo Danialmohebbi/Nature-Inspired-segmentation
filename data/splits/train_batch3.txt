@@ -1,0 +1,5 @@
+42078.jpg,gray
+41025.jpg,gray
+45096.jpg,color
+42049.jpg,color
+42012.jpg,color

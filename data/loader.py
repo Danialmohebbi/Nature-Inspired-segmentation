@@ -4,11 +4,7 @@ import cv2
 
 BASE_DIR = Path(__file__).resolve().parent.parent / "data" / "images"
 SPLITS_DIR = Path(__file__).resolve().parent.parent / "data" / "splits"
-
-SPLIT_FOLDERS = {
-    "train": ["train", "val"],
-    "test": ["test"],
-}
+    
 
 
 def load_image(path, mode="color"):

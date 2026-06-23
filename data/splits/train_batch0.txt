@@ -2,3 +2,4 @@ barbara.png,gray
 cameraman.png,gray
 mandrill.png,color
 peppers.png,color
+100075.jpg,gray

@@ -19,7 +19,7 @@ CSV_HEADER = [
     "convergence","runtime_seconds", "thresholds"
 ]
 
-def get_csv_path(mode,fitness_fn):
+def get_csv_path(mode,fitness_fn,split):
     """
     returns the path to the correct output file and make sure the directory exists.
     Args:
@@ -29,9 +29,9 @@ def get_csv_path(mode,fitness_fn):
         output_path (str): path to the output file.
     """
     os.makedirs(OUTPUT_DIR,exist_ok=True)
-    return os.path.join(OUTPUT_DIR,f"output_{mode}_{fitness_fn}.csv")
+    return os.path.join(OUTPUT_DIR,f"{split}_output_{mode}_{fitness_fn}.csv")
 
-def prepare_csv(mode,fitness_fn):
+def prepare_csv(mode,fitness_fn,split):
     """
     Prepare the csv file for a given mode if it doesn't exist.
 
@@ -39,13 +39,13 @@ def prepare_csv(mode,fitness_fn):
         mode (str): 'gray' or 'color' image type.
         fitness_fn (str): denotes the name of the fitness function used.
     """
-    output_path = get_csv_path(mode,fitness_fn)
+    output_path = get_csv_path(mode,fitness_fn,split)
     if not os.path.exists(output_path):
         with open(output_path,'w',newline="") as file:
             writer = csv.DictWriter(file,fieldnames=CSV_HEADER)
             writer.writeheader()
 
-def add_row(row,mode,fitness_fn):
+def add_row(row,mode,fitness_fn,split):
     """
     add a row to a given mode csv output results.
     Args:
@@ -53,7 +53,7 @@ def add_row(row,mode,fitness_fn):
         mode (str):  'gray' or 'color' image type.
         fitness_fn (str): denotes the name of the fitness function used.
     """
-    output_path = get_csv_path(mode,fitness_fn)
+    output_path = get_csv_path(mode,fitness_fn,split)
     with open(output_path, 'a', newline="") as file:
         writer = csv.DictWriter(file,fieldnames=CSV_HEADER)
         writer.writerow(row)
@@ -102,13 +102,13 @@ def run(algo, image_path, image_id, mode, k, trial,fitness_fn):
         print(f"=====   FAILED  | algo={algo} | image_id={image_id} | mode={mode} | k={k} | trial={trial} | {e} =====")
         return None
     
-def run_experiment(algorithms, k_values, n_trials, fitness_fn):
+def run_experiment(algorithms, k_values, n_trials, fitness_fn,split):
     """
     """
-    all_images = get_image_paths("train")
+    all_images = get_image_paths(split)
 
-    prepare_csv('gray',fitness_fn)
-    prepare_csv('color',fitness_fn)
+    prepare_csv('gray',fitness_fn,split)
+    prepare_csv('color',fitness_fn,split)
 
     tasks = []
     for algo in algorithms:
@@ -125,7 +125,7 @@ def run_experiment(algorithms, k_values, n_trials, fitness_fn):
         for algo, path, image_id, mode, k, trial,fitness_fn in tasks
     ):
         if row is not None:
-            add_row(row, row['mode'],fitness_fn)
+            add_row(row, row['mode'],fitness_fn,split)
             saved += 1
         else:
             failed += 1

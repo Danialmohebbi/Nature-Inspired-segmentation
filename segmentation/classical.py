@@ -66,22 +66,35 @@ def kmeans_thresholding(image, k, mode="color"):
     """
     if mode == "gray":
         x = image.flatten().reshape(-1, 1).astype(np.float32)
-        kmeans = KMeans(n_clusters=k, random_state=42,n_init=10)
-        y_pred = kmeans.fit_predict(x)
+        kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+        kmeans.fit(x)
         cluster_centers = kmeans.cluster_centers_.flatten()
-        segmented_image = cluster_centers[y_pred].reshape(image.shape).astype(np.uint8)
-        return segmented_image, sorted(cluster_centers.tolist())
+
+        sorted_centers = sorted(cluster_centers.tolist())
+        thresholds = [
+            (sorted_centers[i] + sorted_centers[i + 1]) / 2
+            for i in range(len(sorted_centers) - 1)
+        ]
+
+        segmented_image = apply_thresholds(image, thresholds)
+        return segmented_image, thresholds
     else:
         segmented_image = np.zeros_like(image, dtype=np.uint8)
         thresholds = []
         for channel in range(3):
-            x = image[:, :, channel].flatten().reshape(-1, 1).astype(np.uint8)
-            kmeans = KMeans(n_clusters=k, random_state=42,n_init=10)
-            y_pred = kmeans.fit_predict(x)
+            x = image[:, :, channel].flatten().reshape(-1, 1).astype(np.float32)
+            kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+            kmeans.fit(x)
             cluster_centers = kmeans.cluster_centers_.flatten()
-            segmented_image[:, :, channel] = cluster_centers[y_pred].reshape(image[:, :, channel].shape)
-            thresholds.extend(sorted(cluster_centers.tolist()))
-        return segmented_image.astype(np.uint8), thresholds
 
+            sorted_centers = sorted(cluster_centers.tolist())
+            channel_thresholds = [
+                (sorted_centers[i] + sorted_centers[i + 1]) / 2
+                for i in range(len(sorted_centers) - 1)
+            ]
+            thresholds.extend(channel_thresholds)
+            segmented_image[:, :, channel] = apply_thresholds(image[:, :, channel], channel_thresholds)
+
+        return segmented_image.astype(np.uint8), thresholds
 
 

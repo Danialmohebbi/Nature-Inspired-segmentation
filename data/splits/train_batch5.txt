@@ -1,0 +1,5 @@
+76002.jpg,gray
+97017.jpg,gray
+163085.jpg,color
+160068.jpg,color
+148089.jpg,color

@@ -1,0 +1,5 @@
+3096.jpg,color
+302008.jpg,color
+33066.jpg,gray
+314016.jpg,gray
+311081.jpg,gray
