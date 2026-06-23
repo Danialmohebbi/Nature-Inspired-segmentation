@@ -1,5 +1,4 @@
-from fileinput import filename
-
+import time
 from joblib import Parallel, delayed
 import numpy as np
 import os
@@ -17,7 +16,7 @@ OUTPUT_DIR = "results"
 CSV_HEADER = [
     "algo","image_id","mode","k","trial","fitness_fn",
     "MSE","PSNR","FSIM","SSIM","QILV","fitness",
-    "convergence"
+    "convergence","runtime_seconds"
 ]
 
 def get_csv_path(mode,fitness_fn):
@@ -74,9 +73,10 @@ def run(algo, image_path, image_id, mode, k, trial,fitness_fn):
         fitness_fn (str): denotes the name of the fitness function used.
     """
     try:
-        
+        start_time = time.time()
         image = load_image(image_path,mode=mode)
         result = run_segmentation(algo, image,k,mode=mode,fitness_fn=fitness_fn)
+        elapsed = time.time() - start_time
         metrics = compute_all_metrics(image,result["segmented_image"],mode=mode)
         
         row = {
@@ -92,7 +92,8 @@ def run(algo, image_path, image_id, mode, k, trial,fitness_fn):
             "SSIM": metrics["SSIM"],
             "QILV": metrics["QILV"],
             "fitness": result["fitness"],
-            "convergence": result["history"]
+            "convergence": result["history"],
+            "runtime_seconds": elapsed
         }
         
         return row
@@ -111,7 +112,7 @@ def run_experiment(algorithms, k_values, n_trials, fitness_fn):
     tasks = []
     for algo in algorithms:
         for k in k_values:
-            for trial in range(1,n_trials):
+            for trial in range(n_trials):
                 for (path, mode) in all_images:
                     image_id = os.path.basename(path)
                     tasks.append((algo, path, image_id, mode, k, trial,fitness_fn))
