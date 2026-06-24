@@ -3,7 +3,7 @@ from joblib import Parallel, delayed
 import numpy as np
 import os
 import csv
-
+import json
 from data.loader import load_image,get_image_paths
 from fitness.reconstruction import compute_all_metrics
 from segmentation.base_segmenter import run_segmentation
@@ -92,9 +92,9 @@ def run(algo, image_path, image_id, mode, k, trial,fitness_fn):
             "SSIM": metrics["SSIM"],
             "QILV": metrics["QILV"],
             "fitness": result["fitness"],
-            "convergence": result["history"],
+            "convergence": json.dumps([float(v) for v in result["history"]]),
             "runtime_seconds": elapsed,
-            "thresholds": result["thresholds"]
+            "thresholds": json.dumps([float(v) for v in result["thresholds"]])
         }
         
         return row
