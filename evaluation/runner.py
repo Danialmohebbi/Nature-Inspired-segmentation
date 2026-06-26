@@ -78,7 +78,8 @@ def run(algo, image_path, image_id, mode, k, trial,fitness_fn):
         result = run_segmentation(algo, image,k,mode=mode,fitness_fn=fitness_fn)
         elapsed = time.time() - start_time
         metrics = compute_all_metrics(image,result["segmented_image"],mode=mode)
-        
+        convergence = json.dumps([float(v) for v in result["history"]]) if result["history"] else None
+        thresholds = json.dumps([float(v) for v in result["thresholds"]]) if result["thresholds"] else None
         row = {
             "algo": algo,
             "image_id": image_id,
@@ -92,9 +93,9 @@ def run(algo, image_path, image_id, mode, k, trial,fitness_fn):
             "SSIM": metrics["SSIM"],
             "QILV": metrics["QILV"],
             "fitness": result["fitness"],
-            "convergence": json.dumps([float(v) for v in result["history"]]),
+            "convergence": convergence,
             "runtime_seconds": elapsed,
-            "thresholds": json.dumps([float(v) for v in result["thresholds"]])
+            "thresholds": thresholds
         }
         
         return row
