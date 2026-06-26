@@ -1,5 +1,5 @@
 import numpy as np
-from skimage.filters import threshold_multiotsu
+from skimage.filters import threshold_otsu
 from sklearn.cluster import KMeans
 
 def apply_thresholds(channel, thresholds):
@@ -20,7 +20,30 @@ def apply_thresholds(channel, thresholds):
             segmented_image[mask] = channel[mask].mean()
     return segmented_image.astype(np.uint8)
     
+def recursive_otsu(ch, k):
+    regions = [ch.flatten()]
+    thresholds = []
+    
+    while len(regions) < k:
+        split_idx = max(range(len(regions)), key=lambda i: len(regions[i]))
+        regions_pixels = regions[split_idx]
+        
+        if len(regions_pixels) < 2 or regions_pixels.min() == regions_pixels.max():
+            break
+        
+        local_threshold = threshold_otsu(regions_pixels)
+        thresholds.append(int(local_threshold))
+        
+        lower = regions_pixels[regions_pixels <= local_threshold]
+        upper = regions_pixels[regions_pixels > local_threshold]
+        
+        regions.pop(split_idx)
+        regions.append(lower)
+        regions.append(upper)
+    
+    return sorted(thresholds)
 
+    
 
 def otsu_thresholding(image, k, mode="color"):
     """
@@ -37,17 +60,17 @@ def otsu_thresholding(image, k, mode="color"):
             thresholds (list of uint8): k-1 threshold values.
     """
     if mode == "gray":
-        thresholds = threshold_multiotsu(image, classes=k)
-        segmented_image = apply_thresholds(image, thresholds)
-        return segmented_image,thresholds
+        thresholds = recursive_otsu(image, k)
+        segmented = apply_thresholds(image, thresholds)
+        return segmented,thresholds
     else:
         thresholds = []
-        segmented_image = np.zeros_like(image, dtype=np.uint8)
+        segmented = np.zeros_like(image, dtype=np.uint8)
         for channel in range(3):
-            channel_thresholds = threshold_multiotsu(image[:, :, channel], classes=k)
-            segmented_image[:, :, channel] = apply_thresholds(image[:, :, channel], channel_thresholds)
+            channel_thresholds = recursive_otsu(image[:, :, channel], k)
+            segmented[:, :, channel] = apply_thresholds(image[:, :, channel], channel_thresholds)
             thresholds.extend(sorted(channel_thresholds))
-        return segmented_image.astype(np.uint8),thresholds
+        return segmented.astype(np.uint8),thresholds
 
 
 def kmeans_thresholding(image, k, mode="color"):
