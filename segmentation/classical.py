@@ -65,36 +65,22 @@ def kmeans_thresholding(image, k, mode="color"):
             thresholds (list of uint8): k-1 threshold values.
     """
     if mode == "gray":
-        x = image.flatten().reshape(-1, 1).astype(np.float32)
+        x = image.flatten().reshape(-1,1).astype(np.float32)
         kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-        kmeans.fit(x)
-        cluster_centers = kmeans.cluster_centers_.flatten()
-
-        sorted_centers = sorted(cluster_centers.tolist())
-        thresholds = [
-            (sorted_centers[i] + sorted_centers[i + 1]) / 2
-            for i in range(len(sorted_centers) - 1)
-        ]
-
-        segmented_image = apply_thresholds(image, thresholds)
-        return segmented_image, thresholds
+        y = kmeans.fit_predict(x)
+        centroids = kmeans.cluster_centers_.flatten()
+        segmented = centroids[y].reshape(image.shape).astype(np.uint8)
+        return segmented, sorted(centroids.tolist())
     else:
-        segmented_image = np.zeros_like(image, dtype=np.uint8)
+        segmented = np.zeros_like(image,dtype=np.uint8)
         thresholds = []
-        for channel in range(3):
-            x = image[:, :, channel].flatten().reshape(-1, 1).astype(np.float32)
+        for ch in range(3):
+            x = image[:, :, ch].flatten().reshape(-1,1).astype(np.float32)
             kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-            kmeans.fit(x)
-            cluster_centers = kmeans.cluster_centers_.flatten()
-
-            sorted_centers = sorted(cluster_centers.tolist())
-            channel_thresholds = [
-                (sorted_centers[i] + sorted_centers[i + 1]) / 2
-                for i in range(len(sorted_centers) - 1)
-            ]
-            thresholds.extend(channel_thresholds)
-            segmented_image[:, :, channel] = apply_thresholds(image[:, :, channel], channel_thresholds)
-
-        return segmented_image.astype(np.uint8), thresholds
+            y = kmeans.fit_predict(x)
+            centroids = kmeans.cluster_centers_.flatten()
+            segmented[:, :, ch] = centroids[y].reshape(image[:, :, ch].shape).astype(np.uint8)
+            thresholds.extend(sorted(centroids.tolist()))
+        return segmented,thresholds
 
 
