@@ -13,6 +13,8 @@ from segmentation.classical import otsu_thresholding
 from segmentation.problem import FITNESS_FUNCTIONS, SegmentationProblem
 from segmentation.classical import apply_thresholds
 
+#========================== Nature inspired metaheuristic algorithms =========================
+
 NATURE_ALGO  = {
     "ga": BaseGA,
     "cmaes": CMA_ES,
@@ -24,6 +26,8 @@ NATURE_ALGO  = {
     "hc": OriginalHC,
     "sa": OriginalSA
 }
+
+#========================== Classical algorithms =========================
 
 CLASSICAL_ALGO = {
     "otsu": otsu_thresholding,
@@ -40,6 +44,7 @@ def segment_image(image, thresholds, k ,mode="color"):
     Args:
         image (np.ndarray): uint8 np.ndarray of shape (H,W) for gray images and (H,W,3) for color images.
         thresholds (list of uint8): k-1 threshold values.
+        k (int): Number of segments.
         mode (str, optional): 'gray' or 'color' image. Defaults to "color".
 
     Returns:
@@ -57,13 +62,14 @@ def segment_image(image, thresholds, k ,mode="color"):
         return segmented_image.astype(np.uint8)
 
 def run_segmentation(algorithm_name, image, k, mode="color", fitness_fn = "kapur", params = None):
-    """_summary_
-
+    """
+    Run image segmentation using a specified algorithm and fitness function.
     Args:
         algorithm_name (str): Key from NATURE_ALGO or CLASSICAL_ALGO.
         image (np.ndarray): uint8 np.ndarray of shape (H,W) for gray images and (H,W,3) for color images.
         k (int): Number of segments.
         mode (str, optional): 'gray' or 'color' image. Defaults to "color".
+        fitness_fn (str, optional): Key from FITNESS_FUNCTIONS. Defaults to "kapur".
         params (dict, optional): Hyperparameters for metaheuristic algorithms. Defaults to epoch=500, pop_size=80.
 
     Raises:

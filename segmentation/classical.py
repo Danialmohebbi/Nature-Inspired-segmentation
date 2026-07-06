@@ -21,6 +21,16 @@ def apply_thresholds(channel, thresholds):
     return segmented_image.astype(np.uint8)
     
 def recursive_otsu(ch, k):
+    """
+    Recursively partition a flattened intensity array into k segments using Otsu's binary thresholding at each step.
+
+    Args:
+        ch (np.ndarray): Flattened intensity array.
+        k (int): Number of segments.
+
+    Returns:
+        list: Sorted List of threshold values.
+    """
     regions = [ch.flatten()]
     thresholds = []
     
@@ -47,7 +57,7 @@ def recursive_otsu(ch, k):
 
 def otsu_thresholding(image, k, mode="color"):
     """
-    Segment an image using multi-level otsu thresholding.
+    Segment an image using recursive otsu thresholding.
 
     Args:
         image (np.ndarray): uint8 np.ndarray of shape (H,W) for gray images and (H,W,3) for color images.

@@ -1,6 +1,7 @@
 import numpy as np
 from fitness.kapur import kapur_entropy_fitness, reconstruct_for_fitness
 def compute_penality(image):
+
     img = image.astype(np.float32)
     horizental = np.abs(img[:, :-1] - img[:, 1:]).mean()
     vertical = np.abs(img[:-1, :] - img[1:, :]).mean()
