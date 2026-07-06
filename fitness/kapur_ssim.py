@@ -2,7 +2,7 @@ import numpy as np
 from fitness.kapur import kapur_entropy_fitness,reconstruct_for_fitness
 from fitness.reconstruction import compute_ssim
 L = 256
-
+LAMBDA = 0.5
 def kapur_ssim_fitness(image, thresholds, k, mode="color"):
     """
         Return mix of kapur and ssim

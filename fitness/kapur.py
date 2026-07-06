@@ -1,8 +1,6 @@
 import numpy as np
 from segmentation.classical import apply_thresholds
 
-LAMBDA = 0.5
-L = 256
 SMALL_VALUE = 1e-10
 
 def single_channel_kapur(image_channel, thresholds):
