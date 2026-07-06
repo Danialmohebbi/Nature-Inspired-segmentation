@@ -2,12 +2,13 @@ import numpy as np
 from mealpy import FloatVar, Problem
 import sys
 import os
-from fitness.kapur import kapur_entropy_fitness, kapur_spatial, kapur_ssim
-
+from fitness.kapur import kapur_entropy_fitness
+from fitness.kapur_spatial import kapur_spatial_fitness
+from fitness.kapur_ssim import kapur_ssim_fitness
 FITNESS_FUNCTIONS = {
     "kapur" : kapur_entropy_fitness,
-    "kapur_spatial": kapur_spatial,
-    "kapur_ssim": kapur_ssim 
+    "kapur_spatial": kapur_spatial_fitness,
+    "kapur_ssim": kapur_ssim_fitness 
 }
 
 

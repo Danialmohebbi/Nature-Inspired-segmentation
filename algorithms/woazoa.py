@@ -25,11 +25,16 @@ class WOAZOA(Optimizer):
             u = np.random.rand()
             if u < p:
                 """ZOA Exploration phase"""
-                j, k = np.random.choice(range(self.pop_size), 2, replace=False)
-                x_j = self.pop[j].solution
-                x_k = self.pop[k].solution
-                r_1, r_2 = np.random.rand(), np.random.rand()
-                new_position = position + r_1 * (x_j - x_k) + r_2 * (best_solution - position)
+                Ps = np.random.rand()
+                R = 0.01
+                if Ps <= 0.5:
+                    r = np.random.rand()
+                    new_position = position + R * (2*r - 1) * (1 - epoch/self.epoch) * position
+                else:
+                    az = self.pop[np.random.randint(0, self.pop_size)].solution
+                    I = np.round(1 + np.random.rand())
+                    r = np.random.rand(len(position))
+                    new_position = position + r * (az - I * position)
             else:
                 """WOA Exploitation phase"""
                 r_1, r_2 = np.random.rand(), np.random.rand()
