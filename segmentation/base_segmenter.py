@@ -35,7 +35,7 @@ CLASSICAL_ALGO = {
 }
 
 DEFAULT_POP_SIZE = 50
-DEFAULT_EPOCHS = 500
+DEFAULT_EPOCHS = 25000
 
 def segment_image(image, thresholds, k ,mode="color"):
     """
