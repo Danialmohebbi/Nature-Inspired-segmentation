@@ -22,9 +22,7 @@ NATURE_ALGO  = {
     "woa": OriginalWOA,
     "gwo": OriginalGWO,
     "zoa": OriginalZOA,
-    "woazoa": WOAZOA,
-    "hc": OriginalHC,
-    "sa": OriginalSA
+    "woazoa": WOAZOA
 }
 
 #========================== Classical algorithms =========================
@@ -35,7 +33,7 @@ CLASSICAL_ALGO = {
 }
 
 DEFAULT_POP_SIZE = 50
-DEFAULT_EPOCHS = 25000
+DEFAULT_EPOCHS = 500
 
 def segment_image(image, thresholds, k ,mode="color"):
     """
