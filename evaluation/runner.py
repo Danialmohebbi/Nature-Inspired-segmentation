@@ -25,6 +25,7 @@ def get_csv_path(mode,fitness_fn,split):
     Args:
         mode (str): 'gray' or 'color' image type.
         fitness_fn (str): denotes the name of the fitness function used.
+        split (str): name of the image split text file used to get the images.
     Return:
         output_path (str): path to the output file.
     """
@@ -38,6 +39,7 @@ def prepare_csv(mode,fitness_fn,split):
     Args:
         mode (str): 'gray' or 'color' image type.
         fitness_fn (str): denotes the name of the fitness function used.
+        split (str): name of the image split text file used to get the images.
     """
     output_path = get_csv_path(mode,fitness_fn,split)
     if not os.path.exists(output_path):
@@ -47,11 +49,12 @@ def prepare_csv(mode,fitness_fn,split):
 
 def add_row(row,mode,fitness_fn,split):
     """
-    add a row to a given mode csv output results.
+    Add a row to a given mode csv output results.
     Args:
         row (dict): contains values corresponding to the header.
         mode (str):  'gray' or 'color' image type.
         fitness_fn (str): denotes the name of the fitness function used.
+        split (str): name of the image split text file used to get the images.
     """
     output_path = get_csv_path(mode,fitness_fn,split)
     with open(output_path, 'a', newline="") as file:
@@ -105,6 +108,7 @@ def run(algo, image_path, image_id, mode, k, trial,fitness_fn):
     
 def run_experiment(algorithms, k_values, n_trials, fitness_fn,split):
     """
+    Run the experiment for all algorithms, k values, and trials on the specified image split.
     """
     all_images = get_image_paths(split)
 
