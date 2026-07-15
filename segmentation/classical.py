@@ -20,18 +20,18 @@ def apply_thresholds(channel, thresholds):
             segmented_image[mask] = channel[mask].mean()
     return segmented_image.astype(np.uint8)
     
-def recursive_otsu(ch, k):
+def recursive_otsu(channel, k):
     """
     Recursively partition a flattened intensity array into k segments using Otsu's binary thresholding at each step.
 
     Args:
-        ch (np.ndarray): Flattened intensity array.
+        channel (np.ndarray): Flattened intensity array.
         k (int): Number of segments.
 
     Returns:
         list: Sorted List of threshold values.
     """
-    regions = [ch.flatten()]
+    regions = [channel.flatten()]
     thresholds = []
     
     while len(regions) < k:
@@ -41,11 +41,11 @@ def recursive_otsu(ch, k):
         if len(regions_pixels) < 2 or regions_pixels.min() == regions_pixels.max():
             break
         
-        local_threshold = threshold_otsu(regions_pixels)
-        thresholds.append(int(local_threshold))
+        local_region_threshold = threshold_otsu(regions_pixels)
+        thresholds.append(int(local_region_threshold))
         
-        lower = regions_pixels[regions_pixels <= local_threshold]
-        upper = regions_pixels[regions_pixels > local_threshold]
+        lower = regions_pixels[regions_pixels <= local_region_threshold]
+        upper = regions_pixels[regions_pixels > local_region_threshold]
         
         regions.pop(split_idx)
         regions.append(lower)
